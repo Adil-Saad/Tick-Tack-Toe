@@ -23,6 +23,7 @@ class TicTacToe:
         self.board = Board()
         self.game_active = True
         self.winning_combo = None
+        self.animation_in_progress = False
 
         self.stats = {
             'X': {'wins': 0, 'losses': 0, 'draws': 0},
@@ -66,28 +67,17 @@ class TicTacToe:
             button.grid(row=i//3, column=i%3, padx=2, pady=2)
             self.buttons.append(button)
 
-        # Player type selection
-        self.player_frame = tk.Frame(self.master, bg='black')
-        self.player_frame.pack(pady=10)
+        # Opponent selection
+        self.opponent_frame = tk.Frame(self.master, bg='black')
+        self.opponent_frame.pack(pady=10)
 
-        # Player 1 selects X or O
-        tk.Label(self.player_frame, text="Player 1 (Choose X or O):", 
+        tk.Label(self.opponent_frame, text="Opponent:", 
                  font=('Courier', 12), fg='yellow', bg='black').grid(row=0, column=0, padx=5)
-
-        self.player_types = {}
-        self.player_types['X_O'] = ttk.Combobox(self.player_frame, 
-            values=['X', 'O'], state='readonly', width=5, font=('comic sans ms', 10))
-        self.player_types['X_O'].set('X')
-        self.player_types['X_O'].grid(row=0, column=1, padx=5)
-
-        # Player 2 (AI or Human)
-        tk.Label(self.player_frame, text="Player 2:", 
-                 font=('Courier', 12), fg='yellow', bg='black').grid(row=1, column=0, padx=5)
-        self.player_types['P2'] = ttk.Combobox(self.player_frame, 
-            values=['Human', 'Easy', 'Medium', 'Hard', 'Unbeatable'], 
+        self.opponent_type = ttk.Combobox(self.opponent_frame, 
+            values=['Human', 'Easy AI', 'Medium AI', 'Hard AI', 'Unbeatable AI'], 
             state='readonly', width=15, font=('comic sans ms', 10))
-        self.player_types['P2'].set('Human')
-        self.player_types['P2'].grid(row=1, column=1, padx=5)
+        self.opponent_type.set('Human')
+        self.opponent_type.grid(row=0, column=1, padx=5)
 
         # Statistics
         self.stats_frame = tk.Frame(self.master, bg='black')
@@ -123,8 +113,7 @@ class TicTacToe:
         self.scoreboard.pack(pady=5)
 
     def make_move(self, index):
-        if not self.game_active:
-            print("Game is not active")
+        if not self.game_active or self.animation_in_progress:
             return
 
         row, col = index // 3, index % 3
@@ -143,7 +132,7 @@ class TicTacToe:
             self.current_player_label.config(text=f"Current Player: {self.current_player}")
             self.update_board_color()
             
-            if self.player_types['P2'].get() != 'Human' and self.current_player != self.player_types['X_O'].get():
+            if self.opponent_type.get() != 'Human' and self.current_player == 'O':
                 self.master.after(500, self.ai_move)
 
     def check_game_over(self):
@@ -154,19 +143,41 @@ class TicTacToe:
                 self.win_sound.play()
             self.animate_win()
             winner_symbol = 'X' if winner == 1 else 'O'
-            messagebox.showinfo("Game Over", f"Player {winner_symbol} wins!")
-            self.update_stats(winner_symbol)
             self.game_active = False
+            self.master.after(1000, lambda: self.show_game_over_message(f"Player {winner_symbol} wins!"))
             return True
         elif self.board.isfull():
             if self.draw_sound:
                 self.draw_sound.play()
-            messagebox.showinfo("Game Over", "It's a draw!")
-            self.update_stats('cat')
-            self.reset_board_color()
             self.game_active = False
+            self.master.after(1000, lambda: self.show_game_over_message("It's a draw!"))
             return True
         return False
+
+    def show_game_over_message(self, message):
+        messagebox.showinfo("Game Over", message)
+        self.update_stats('X' if message.startswith("Player X") else 'O' if message.startswith("Player O") else 'cat')
+        self.reset_board()
+
+    def reset_board(self):
+        self.board = Board()
+        for button in self.buttons:
+            button.config(text='', fg='black', bg='SystemButtonFace')
+        self.game_active = True
+        self.current_player = 'X'
+        self.current_player_label.config(text="Current Player: X")
+        self.update_board_color()
+        self.winning_combo = None
+        self.animation_in_progress = False
+
+        # Add this line to prevent immediate AI move after resetting
+        if self.opponent_type.get() != 'Human' and self.current_player == 'O':
+            self.master.after(500, self.ai_move)
+
+    def show_game_over_message(self, message):
+        messagebox.showinfo("Game Over", message)
+        self.update_stats('X' if message.startswith("Player X") else 'O' if message.startswith("Player O") else 'cat')
+        self.reset_board()
 
     def animate_move(self, button):
         original_color = button.cget("background")
@@ -174,47 +185,38 @@ class TicTacToe:
         self.master.after(200, lambda: button.config(bg=original_color))
 
     def animate_win(self):
+        self.animation_in_progress = True
         for tile in self.winning_combo:
             self.animate_rgb(self.buttons[tile[0]*3 + tile[1]])
 
-        for i in range(9):
-            if (i//3, i%3) not in self.winning_combo:
-                self.animate_tile_break(self.buttons[i])
-
     def animate_rgb(self, button):
-        for _ in range(10):  # Change colors 10 times
+        for _ in range(5):  # Change colors 5 times
             button.config(bg=random.choice(['red', 'green', 'blue', 'yellow', 'purple', 'cyan']))
             self.master.update()
             time.sleep(0.1)
-
-    def animate_tile_break(self, button):
-        for _ in range(3):
-            button.config(bg='white')
-            self.master.update()
-            time.sleep(0.1)
-        button.config(text='', bg='white')
+        self.animation_in_progress = False
 
     def update_board_color(self):
-        if self.current_player == self.player_types['X_O'].get():  # Player 1
-            self.board_frame.config(bg='blue')
-        else:  # Player 2
-            self.board_frame.config(bg='red')
+        self.board_frame.config(bg='blue' if self.current_player == 'X' else 'red')
 
     def reset_board_color(self):
         self.board_frame.config(bg='gray')
 
     def ai_move(self):
-        difficulty = self.player_types['P2'].get()
-        ai_player = 2 if self.current_player == 'O' else 1
+        if not self.game_active:
+            return
+
+        difficulty = self.opponent_type.get()
+        ai_player = 2  # AI is always 'O'
         self.ai.player = ai_player
         
-        if difficulty == 'Easy':
+        if difficulty == 'Easy AI':
             self.ai.level = 0
-        elif difficulty == 'Medium':
+        elif difficulty == 'Medium AI':
             self.ai.level = 1
-        elif difficulty == 'Hard':
+        elif difficulty == 'Hard AI':
             self.ai.level = 2
-        else:  # Unbeatable
+        else:  # Unbeatable AI
             self.ai.level = 3
         
         row, col = self.ai.eval(self.board)
@@ -251,7 +253,7 @@ class TicTacToe:
     def update_scoreboard(self):
         self.scoreboard.config(text=f"X: {self.stats['X']['wins']}  O: {self.stats['O']['wins']}")
 
-    def reset_game(self):
+    def reset_board(self):
         self.board = Board()
         for button in self.buttons:
             button.config(text='', fg='black', bg='SystemButtonFace')
@@ -259,8 +261,18 @@ class TicTacToe:
         self.current_player = 'X'
         self.current_player_label.config(text="Current Player: X")
         self.update_board_color()
-        if self.player_types['P2'].get() != 'Human' and self.current_player != self.player_types['X_O'].get():
-            self.master.after(500, self.ai_move)
+        self.winning_combo = None
+        self.animation_in_progress = False
+
+    def reset_game(self):
+        self.reset_board()
+        self.stats = {
+            'X': {'wins': 0, 'losses': 0, 'draws': 0},
+            'O': {'wins': 0, 'losses': 0, 'draws': 0},
+            'cats': 0
+        }
+        self.update_stats_display()
+        self.update_scoreboard()
 
 class Board:
     def __init__(self):
@@ -342,14 +354,15 @@ class AI:
         idx = random.randrange(0, len(empty_sqrs))
         return empty_sqrs[idx]
 
-    def minimax(self, board, maximizing):
+    def minimax(self, board, maximizing, depth):
         case = board.final_state()
 
-        if case == 1:
+        # Terminal state reached: return evaluation based on winner or draw
+        if case == 1:  # X wins
             return 1, None
-        if case == 2:
+        if case == 2:  # O wins
             return -1, None
-        elif board.isfull():
+        elif board.isfull() or depth == 0:  # Draw or depth limit reached
             return 0, None
 
         if maximizing:
@@ -359,40 +372,92 @@ class AI:
 
             for (row, col) in empty_sqrs:
                 temp_board = copy.deepcopy(board)
-                temp_board.mark_sqr(row, col, 1)
-                eval = self.minimax(temp_board, False)[0]
+                temp_board.mark_sqr(row, col, 1)  # Player X is maximizing
+                eval = self.minimax(temp_board, False, depth - 1)[0]
                 if eval > max_eval:
                     max_eval = eval
                     best_move = (row, col)
 
             return max_eval, best_move
 
-        elif not maximizing:
+        else:
             min_eval = 100
             best_move = None
             empty_sqrs = board.get_empty_sqrs()
 
             for (row, col) in empty_sqrs:
                 temp_board = copy.deepcopy(board)
-                temp_board.mark_sqr(row, col, self.player)
-                eval = self.minimax(temp_board, True)[0]
+                temp_board.mark_sqr(row, col, self.player)  # Player O is minimizing
+                eval = self.minimax(temp_board, True, depth - 1)[0]
                 if eval < min_eval:
                     min_eval = eval
                     best_move = (row, col)
 
             return min_eval, best_move
 
+    def check_for_win(self, board, ai_player):
+        """
+        Checks if there is an opportunity for the AI to win the game.
+        """
+        empty_sqrs = board.get_empty_sqrs()
+
+        # Check all empty squares and see if AI can win if it marks that square
+        for (row, col) in empty_sqrs:
+            temp_board = copy.deepcopy(board)
+            temp_board.mark_sqr(row, col, ai_player)
+            if temp_board.final_state() == ai_player:
+                return (row, col)  # Found a winning move
+
+        return None  # No winning move found
+
+    def check_for_block(self, board, opponent):
+        """
+        Checks if there is an opportunity to block the opponent's winning move.
+        """
+        empty_sqrs = board.get_empty_sqrs()
+
+        # Check all empty squares and see if opponent can win if they mark that square
+        for (row, col) in empty_sqrs:
+            temp_board = copy.deepcopy(board)
+            temp_board.mark_sqr(row, col, opponent)
+            if temp_board.final_state() == opponent:
+                return (row, col)  # Found a block move
+
+        return None  # No block needed
+
     def eval(self, main_board):
+        # Different AI behaviors based on difficulty level
         if self.level == 0:
-            # random choice
-            eval = 'random'
+            # Easy AI: Random move
             move = self.rnd(main_board)
+
+        elif self.level == 1:
+            # Medium AI: Play defensively (block player), aggressively (win if possible), or random move
+
+            # Step 1: Check if AI can win
+            win_move = self.check_for_win(main_board, ai_player=self.player)
+            if win_move:
+                move = win_move
+            else:
+                # Step 2: Check if AI can block the player (player is X, so opponent = 1)
+                block_move = self.check_for_block(main_board, opponent=1)
+                if block_move:
+                    move = block_move
+                else:
+                    # Step 3: No immediate win or block needed, make a random move
+                    move = self.rnd(main_board)
+
+        elif self.level == 2:
+            # Hard AI: Predict 2 moves ahead
+            depth = 2
+            eval, move = self.minimax(main_board, False, depth)
+
         else:
-            # minimax algo choice
-            eval, move = self.minimax(main_board, False)
+            # Unbeatable AI: Max depth, predict all possible outcomes
+            depth = float('inf')  # No depth limit
+            eval, move = self.minimax(main_board, False, depth)
 
-        print(f'AI has chosen to mark the square in pos {move} with an eval of: {eval}')
-
+        print(f'AI (Level {self.level}) has chosen to mark the square in pos {move}')
         return move
 
 if __name__ == "__main__":
