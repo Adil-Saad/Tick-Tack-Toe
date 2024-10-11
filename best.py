@@ -1,3 +1,24 @@
+import subprocess
+import sys
+
+# Function to check and install a package if it's not installed
+def install_and_import(package):
+    try:
+        __import__(package)
+    except ImportError:
+        print(f"Package '{package}' not found. Installing...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+        print(f"'{package}' has been installed.")
+    finally:
+        globals()[package] = __import__(package)
+
+# List of packages required
+packages = ['pygame', 'numpy', 'tkinter']
+
+# Check and install missing packages
+for package in packages:
+    install_and_import(package)
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 import random
