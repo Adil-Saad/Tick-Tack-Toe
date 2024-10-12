@@ -39,7 +39,7 @@ If you do not have Python installed, download it from [python.org](https://www.p
 
 4. Run the game:
     ```bash
-    python best.py
+    python main.py
     ```
 
 ### Method 2: Automatically Install Missing Libraries (for Windows)
@@ -58,7 +58,7 @@ If the required libraries are not installed on your system, the game will try to
 
 3. Run the game directly using the following command. The code will check for missing libraries and install them:
     ```bash
-    python best.py
+    python main.py
     ```
 
 ### Method 3: Use `requirements.txt`
@@ -80,7 +80,7 @@ If the required libraries are not installed on your system, the game will try to
 
 4. Run the game:
     ```bash
-    python best.py
+    python main.py
     ```
 
 ## How to Play
@@ -108,7 +108,7 @@ If the required libraries are not installed on your system, the game will try to
 - Draw Sound: Plays when the game results in a draw.
 
 ### Note:
-Make sure to have the sound files (`move.wav`, `win.wav`, `draw.wav`) in the same directory as the `best.py` file.
+Make sure to have the sound files (`move.wav`, `win.wav`, `draw.wav`) in the same directory as the `main.py` file.
 
 ## Technologies Used
 
