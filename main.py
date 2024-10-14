@@ -86,7 +86,7 @@ class TicTacToe:
 
         self.buttons = []
         for i in range(9):
-            button = tk.Button(self.board_frame, text='', font=('Courier', 20, 'bold'), 
+            button = tk.Button(self.board_frame, text='', font=('Times New Roman', 20, 'bold'), 
                                width=5, height=2, command=lambda x=i: self.make_move(x))
             button.grid(row=i//3, column=i%3, padx=2, pady=2)
             self.buttons.append(button)
@@ -96,21 +96,21 @@ class TicTacToe:
         self.opponent_frame.pack(pady=10)
 
         tk.Label(self.opponent_frame, text="Opponent:", 
-                 font=('Courier', 12), fg='yellow', bg='black').grid(row=0, column=0, padx=5)
+                 font=('Times New Roman', 16), fg='yellow', bg='black').grid(row=0, column=0, padx=7)
         self.opponent_type = ttk.Combobox(self.opponent_frame, 
             values=['Human', 'Easy AI', 'Medium AI', 'Hard AI', 'Unbeatable AI'], 
-            state='readonly', width=15, font=('comic sans ms', 10))
-        self.opponent_type.set('Human')
-        self.opponent_type.grid(row=0, column=1, padx=5)
+            state='readonly', width=15, font=('Times New Roman', 12))
+        self.opponent_type.set('Unbeatable AI')
+        self.opponent_type.grid(row=0, column=1, padx=7)
 
         # Statistics
         self.stats_frame = tk.Frame(self.master, bg='black')
         self.stats_frame.pack(pady=10)
 
         tk.Label(self.stats_frame, text="Game Statistics", 
-                 font=('Courier', 16, 'bold'), fg='yellow', bg='black').pack(pady=5)
+                 font=('Times New Roman', 20, 'bold'), fg='Cyan', bg='black').pack(pady=5)
 
-        self.stats_table = ttk.Treeview(self.stats_frame, columns=('Player', 'Wins', 'Losses', 'Draws'), show='headings', height=3)
+        self.stats_table = ttk.Treeview(self.stats_frame, columns=('Player', 'Wins', 'Losses', 'Draws'), show='headings', height=4)
         self.stats_table.pack()
 
         for col in self.stats_table['columns']:
@@ -122,18 +122,18 @@ class TicTacToe:
         self.stats_table.insert('', 'end', values=('Cats', 0, '-', '-'))
 
         # New Game button
-        self.new_game_button = tk.Button(self.master, text="New Game", font=('Courier', 12, 'bold'),
+        self.new_game_button = tk.Button(self.master, text="New Game", font=('Times New Roman', 12, 'bold'),
                                          command=self.reset_game, bg='green', fg='white')
         self.new_game_button.pack(pady=10)
 
         # Current player display
         self.current_player_label = tk.Label(self.master, text="Current Player: X", 
-                                             font=('Courier', 14, 'bold'), fg='white', bg='black')
+                                             font=('Times New Roman', 14, 'bold'), fg='white', bg='black')
         self.current_player_label.pack(pady=5)
 
         # Scoreboard
         self.scoreboard = tk.Label(self.master, text="X: 0  O: 0", 
-                                   font=('Courier', 16, 'bold'), fg='yellow', bg='black')
+                                   font=('Times New Roman', 16, 'bold'), fg='yellow', bg='black')
         self.scoreboard.pack(pady=5)
 
     def make_move(self, index):
