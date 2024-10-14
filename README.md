@@ -20,29 +20,7 @@ If you do not have Python installed, download it from [python.org](https://www.p
 
 ## Installation
 
-### Method 1: Manual Setup
-
-1. Clone this repository to your local machine:
-    ```bash
-    git clone https://github.com/Adil-Saad/Tick-Tack-Toe.git
-    ```
-
-2. Navigate to the project folder:
-    ```bash
-    cd Tick-Tack-Toe
-    ```
-
-3. Install the required dependencies. If `pip` is not recognized, use `python -m pip` instead of `pip`:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4. Run the game:
-    ```bash
-    python main.py
-    ```
-
-### Method 2: Automatically Install Missing Libraries (for Windows)
+### Method 1: Automatically Install Missing Libraries (for Windows)
 
 If the required libraries are not installed on your system, the game will try to install them automatically using the following steps:
 
@@ -61,7 +39,7 @@ If the required libraries are not installed on your system, the game will try to
     python main.py
     ```
 
-### Method 3: Use `requirements.txt`
+### Method 2: Use `requirements.txt`
 
 1. Clone the repository:
     ```bash
@@ -74,6 +52,28 @@ If the required libraries are not installed on your system, the game will try to
     ```
 
 3. Install the dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. Run the game:
+    ```bash
+    python main.py
+    ```
+
+### Method 3: Manual Setup
+
+1. Clone this repository to your local machine:
+    ```bash
+    git clone https://github.com/Adil-Saad/Tick-Tack-Toe.git
+    ```
+
+2. Navigate to the project folder:
+    ```bash
+    cd Tick-Tack-Toe
+    ```
+
+3. Install the required dependencies. If `pip` is not recognized, use `python -m pip` instead of `pip`:
     ```bash
     pip install -r requirements.txt
     ```
