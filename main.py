@@ -194,7 +194,7 @@ class TicTacToe:
         self.winning_combo = None
         self.animation_in_progress = False
 
-        # Add this line to prevent immediate AI move after resetting
+        # This line prevents immediate AI move after resetting
         if self.opponent_type.get() != 'Human' and self.current_player == 'O':
             self.master.after(500, self.ai_move)
 
