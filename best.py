@@ -26,6 +26,7 @@ import time
 import pygame
 import numpy as np
 import copy
+import os
 
 class TicTacToe:
     def __init__(self, master):
@@ -55,9 +56,11 @@ class TicTacToe:
         # Initialize pygame for sound
         pygame.mixer.init()
         try:
-            self.move_sound = pygame.mixer.Sound("move.wav")
-            self.win_sound = pygame.mixer.Sound("win.wav")
-            self.draw_sound = pygame.mixer.Sound("draw.wav")
+            base_dir = os.path.dirname(os.path.abspath(__file__))  # Get the current directory of the script
+
+            self.move_sound = pygame.mixer.Sound(os.path.join(base_dir, "move.wav"))
+            self.win_sound = pygame.mixer.Sound(os.path.join(base_dir, "win.wav"))
+            self.draw_sound = pygame.mixer.Sound(os.path.join(base_dir, "draw.wav"))
         except pygame.error as e:
             print(f"Error loading sound files: {e}")
             self.move_sound = None
@@ -469,8 +472,8 @@ class AI:
                     move = self.rnd(main_board)
 
         elif self.level == 2:
-            # Hard AI: Predict 2 moves ahead
-            depth = 2
+            # Hard AI: Predict 6 moves ahead
+            depth = 6
             eval, move = self.minimax(main_board, False, depth)
 
         else:
